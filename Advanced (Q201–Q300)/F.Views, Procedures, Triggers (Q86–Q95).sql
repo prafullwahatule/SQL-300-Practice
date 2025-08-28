@@ -1,0 +1,12 @@
+-- F. Views, Procedures, Triggers (Q86–Q95)
+
+-- Q86. Create a view for customer total spend.
+-- Q87. Create a view for monthly revenue.
+-- Q88. Create a view for top 5 pizzas by revenue.
+-- Q89. Write a procedure to get orders by customer_id.
+-- Q90. Write a procedure to insert a new pizza.
+-- Q91. Write a procedure to get monthly revenue trend.
+-- Q92. Write a trigger to update total_amount when order_items change.
+-- Q93. Write a trigger to log cancelled deliveries.
+-- Q94. Write a view to show employee performance (deliveries count).
+-- Q95. Write a view to show customer loyalty (active vs inactive).

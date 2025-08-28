@@ -1,0 +1,12 @@
+-- E. Advanced Functions & Expressions (Q76–Q85)
+
+-- Q76. Show orders where total_amount is odd/even.
+-- Q77. Find pizzas where name length > 10.
+-- Q78. Show revenue in words (CAST/CONVERT if supported).
+-- Q79. Show month name of order_date.
+-- Q80. Find difference in salary between max and min in employees.
+-- Q81. Replace "Veg" with "Vegetarian" in pizza names.
+-- Q82. Show reversed customer names.
+-- Q83. Find substring of pizza_name (first 5 chars).
+-- Q84. Show orders placed on Friday.
+-- Q85. Show orders placed in last 30 days.

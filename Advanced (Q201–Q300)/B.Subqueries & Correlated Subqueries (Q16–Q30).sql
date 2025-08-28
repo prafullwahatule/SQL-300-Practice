@@ -1,0 +1,15 @@
+-- Q16. Find customers who ordered more than average order amount.
+-- Q17. Show pizzas more expensive than average pizza price in their category.
+-- Q18. Find customers whose total spend is more than customer Arjun’s spend.
+-- Q19. List orders containing pizzas not ordered by Priya.
+-- Q20. Find customers who never ordered the cheapest pizza.
+-- Q21. Show employees earning more than avg salary in their role.
+-- Q22. Find pizzas ordered by customers from Delhi only.
+-- Q23. Show orders placed by the customer with max orders.
+-- Q24. Find customers who ordered pizza also ordered by Sneha.
+-- Q25. Show employees who delivered more orders than employee Suraj.
+-- Q26. Find pizzas never ordered by customers from Mumbai.
+-- Q27. Show orders containing the highest-priced pizza.
+-- Q28. Find customers who placed more orders than average orders per customer.
+-- Q29. Show delivery boy with least deliveries.
+-- Q30. Find pizzas ordered in all orders by Priya.
