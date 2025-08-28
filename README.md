@@ -1,0 +1,8 @@
+"# SQL 300 Practice" 
+"" 
+"This repository contains SQL practice queries divided into three levels:" 
+"- Basic (Q1-Q100)" 
+"- Intermediate (Q101-Q200)" 
+"- Advanced (Q201-Q300)" 
+"" 
+"Each folder contains .sql files with questions and schema for practice." 
