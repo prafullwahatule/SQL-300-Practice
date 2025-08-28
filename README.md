@@ -6,3 +6,9 @@
 "- Advanced (Q201-Q300)" 
 "" 
 "Each folder contains .sql files with questions and schema for practice." 
+
+
+# This Is Important to Push 
+git add .
+git commit -m "Updated SQL queries"
+git push
