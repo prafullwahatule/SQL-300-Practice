@@ -2,14 +2,27 @@
 
 
 -- Q61. List orders with customer names.
+SELECT o.order_id, c.first_name, c.last_name
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id;
 
 -- Q62. Show pizzas ordered with order_id.
+SELECT oi.order_id, p.pizza_name
+FROM order_items oi
+JOIN pizzas p ON oi.pizza_id = p.pizza_id;
 
 -- Q63. Show order details with pizza_name, quantity.
+SELECT p.pizza_name, oi.quantity
+FROM pizzas p
+JOIN order_items oi ON p.pizza_id = oi.pizza_id;
 
 -- Q64. Get customer names with their order_id.
+SELECT c.first_name, c.last_name, o.order_id
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id;
 
 -- Q65. Show all orders with customer city.
+SELECT
 
 -- Q66. List each pizza ordered with customer who ordered it.
 
