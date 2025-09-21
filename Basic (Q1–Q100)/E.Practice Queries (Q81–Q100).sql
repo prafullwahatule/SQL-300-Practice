@@ -2,10 +2,13 @@
 
 
 -- Q81. Get distinct cities from customers.
+SELECT DISTINCT city FROM customers;
 
 -- Q82. Find distinct categories from pizzas.
+SELECT DISTINCT category FROM pizzas;
 
 -- Q83. Show total number of unique pizzas ordered.
+SELECT 
 
 -- Q84. Find unique order dates.
 
