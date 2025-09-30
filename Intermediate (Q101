@@ -73,13 +73,7 @@ WHERE p.price = (
 SELECT MAX(price) FROM pizzas);
 
 -- Q53. Show pizzas ordered more than avg quantity.
-SELECT p.pizza_name, oi.quantity
-FROM pizzas p
-JOIN order_items oi
-ON oi.pizza_id = p.pizza_id
-WHERE oi.quantity > (
-SELECT AVG(quantity) FROM order_items);
-
+SELECT p.pizza_name, SUM(oi.quantity) AS total_quantity
 SELECT p.pizza_name, SUM(oi.quantity) AS total_quantity
 FROM pizzas p
 JOIN order_items oi ON oi.pizza_id = p.pizza_id
@@ -117,145 +111,32 @@ HAVING SUM(oi.quantity) = (
 );
 
 -- Q56. Show customers whose order count > avg order count.
-SELECT c.customer_id, c.first_name, c.last_name, COUNT(o.order_id) AS total_orders
-FROM customers c
-JOIN orders o
-ON c.customer_id = o.customer_id
-GROUP BY c.customer_id, c.first_name, c.last_name
-HAVING COUNT(o.order_id) > (
-							SELECT AVG(order_count)
-                            FROM (
-									SELECT COUNT(order_id) AS order_count
-                                    FROM orders
-                                    GROUP BY customer_id
-							) AS t
-						);
-
--- Q57. Show customers who ordered pizza not ordered by others.
-SELECT c.customer_id, c.first_name, c.last_name, p.pizza_name
-FROM customers c
-JOIN orders o
-ON c.customer_id = o.customer_id
-JOIN order_items oi
-ON oi.order_id = o.order_id
-JOIN pizzas p
-ON p.pizza_id = oi.pizza_id
-WHERE p.pizza_id IN (
-					SELECT oi.pizza_id
-                    FROM order_items oi
-                    JOIN orders o
-                    ON oi.order_id = o.order_id
-                    GROUP BY oi.pizza_id
-                    HAVING COUNT(DISTINCT o.customer_id) = 1
-				);
-
--- Q58. Find customers who ordered all Veg pizzas.
-SELECT c.customer_id, c.first_name, c.last_name
-FROM customers c
-JOIN orders o 
-  ON c.customer_id = o.customer_id
-JOIN order_items oi 
-  ON oi.order_id = o.order_id
-JOIN pizzas p 
-  ON p.pizza_id = oi.pizza_id
-WHERE p.category = 'Veg'
-GROUP BY c.customer_id, c.first_name, c.last_name
-HAVING COUNT(DISTINCT p.pizza_id) = (
-    SELECT COUNT(DISTINCT pizza_id)
-    FROM pizzas
-    WHERE category = 'Veg'
-);
-
--- Q59. Show pizzas ordered in orders with total > 900.
-SELECT p.pizza_id, p.pizza_name, p.category FROM pizzas p
-JOIN order_items oi
-ON oi.pizza_id = p.pizza_id
-JOIN orders o
-ON oi.order_id = o.order_id
-WHERE o.order_id IN (SELECT o2.order_id FROM orders o2
-					WHERE o2.total_amount > 900);
-
--- Q60. List pizzas not ordered in June.
-SELECT *
-FROM pizzas
-WHERE pizza_id NOT IN (
-    SELECT DISTINCT oi.pizza_id
-    FROM order_items oi
-    JOIN orders o 
-      ON oi.order_id = o.order_id
-    WHERE MONTH(o.order_date) = 6
-);
-
-
--- Q61. Find cities with avg order > total avg order.
-SELECT t1.city, AVG(t1.city_orders) AS Avg_City_Orders
-FROM (
-    SELECT c.city, COUNT(o.order_id) AS city_orders
-    FROM customers c
-    JOIN orders o
-    ON c.customer_id = o.customer_id
-    GROUP BY c.customer_id, c.city
-) AS t1
-GROUP BY t1.city
-HAVING AVG(t1.city_orders) > (
-    SELECT AVG(order_count)
+SELECT customer_id, COUNT(order_id) AS order_count
+FROM orders
+GROUP BY customer_id
+HAVING COUNT(order_id) > (
+    SELECT AVG(customer_order_count)
     FROM (
-        SELECT COUNT(order_id) AS order_count
+        SELECT COUNT(order_id) AS customer_order_count
         FROM orders
         GROUP BY customer_id
-    ) AS t2
+    ) AS temp
 );
-                        
+
+-- Q57. Show customers who ordered pizza not ordered by others.
+
+-- Q58. Find customers who ordered all Veg pizzas.
+
+-- Q59. Show pizzas ordered in orders with total > 900.
+
+-- Q60. List pizzas not ordered in June.
+
+-- Q61. Find cities with avg order > total avg order.
+
 -- Q62. Show top 2 pizzas by revenue using subquery.
-WITH Top_2_pizza AS (
-	SELECT p.pizza_id, p.pizza_name, SUM(p.price * oi.quantity) AS Revenue
-    FROM pizzas p
-    JOIN order_items oi
-    ON p.pizza_id = oi.pizza_id
-    GROUP BY p.pizza_id, p.pizza_name
-    )
-SELECT * FROM Top_2_Pizza
-ORDER BY Revenue DESC
-LIMIT 2;
 
 -- Q63. Find pizza ordered by customer with max total spend.
-SELECT p.pizza_name, c.first_name, c.last_name
-FROM pizzas p
-JOIN order_items oi 
-  ON p.pizza_id = oi.pizza_id
-JOIN orders o 
-  ON oi.order_id = o.order_id
-JOIN customers c
-  ON c.customer_id = o.customer_id
-WHERE o.customer_id = (
-    SELECT customer_id
-    FROM orders
-    GROUP BY customer_id
-    ORDER BY SUM(total_amount) DESC
-    LIMIT 1
-);
 
 -- Q64. Show customers who never ordered a Non-Veg pizza.
-SELECT c.customer_id, c.first_name, c.last_name
-FROM customers c
-WHERE c.customer_id NOT IN (
-    SELECT o1.customer_id 
-    FROM orders o1
-    JOIN order_items oi1
-      ON o1.order_id = oi1.order_id
-    JOIN pizzas p1
-      ON p1.pizza_id = oi1.pizza_id
-    WHERE p1.category = 'Non-Veg'
-);                     
 
 -- Q65. Show pizzas ordered in orders with more than 2 items.
-SELECT DISTINCT p.pizza_id, p.pizza_name
-FROM pizzas p
-JOIN order_items oi 
-  ON p.pizza_id = oi.pizza_id
-WHERE oi.order_id IN (
-    SELECT order_id
-    FROM order_items
-    GROUP BY order_id
-    HAVING COUNT(*) > 2
-);
