@@ -1,4 +1,4 @@
-"# SQL 300 Practice" 
+# SQL 300 Practice
 "" 
 "This repository contains SQL practice queries divided into three levels:" 
 "- Basic (Q1-Q100)" 
