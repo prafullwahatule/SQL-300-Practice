@@ -1,6 +1,24 @@
 -- C. CTEs (Common Table Expressions) (Q31–Q50)
 
 -- Q31. Use CTE to find total pizzas per customer.
+WITH total_pizzas_cte AS (
+    SELECT 
+        o.customer_id,
+        SUM(oi.quantity) AS total_pizzas
+    FROM orders o
+    JOIN order_items oi 
+        ON o.order_id = oi.order_id
+    GROUP BY o.customer_id
+)
+SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    t.total_pizzas
+FROM total_pizzas_cte t
+JOIN customers c 
+    ON c.customer_id = t.customer_id;
+
 -- Q32. Find avg order value per month using CTE.
 -- Q33. Show top 3 customers by revenue using CTE.
 -- Q34. Find pizza category revenue using CTE.
