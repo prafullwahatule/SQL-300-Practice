@@ -99,9 +99,35 @@ FROM (
 ORDER BY city, city_rank;
 
 -- Q59. Find top 2 pizzas by revenue in each category.
-
+SELECT *
+FROM (
+    SELECT
+        p.category,
+        p.pizza_name,
+        SUM(oi.quantity * p.price) AS revenue,
+        DENSE_RANK() OVER(PARTITION BY p.category ORDER BY SUM(oi.quantity * p.price) DESC) AS cat_rank
+    FROM pizzas p
+    JOIN order_items oi
+        ON oi.pizza_id = p.pizza_id
+    GROUP BY p.category, p.pizza_name
+) AS ranked_pizza
+WHERE cat_rank <= 2
+ORDER BY category, cat_rank;
 
 -- Q60. Show revenue percent contribution of each pizza.
+SELECT
+    p.pizza_name,
+    SUM(oi.quantity * p.price) AS revenue,
+    ROUND(
+        SUM(oi.quantity * p.price) * 100.0 / SUM(SUM(oi.quantity * p.price)) OVER(),
+        2
+    ) AS percentage
+FROM pizzas p
+JOIN order_items oi
+    ON oi.pizza_id = p.pizza_id
+GROUP BY p.pizza_name
+ORDER BY percentage DESC;
+
 -- Q61. Show moving average of total_amount per customer.
 -- Q62. Show customers ranked by order count.
 -- Q63. Find nth highest pizza price using window function.
@@ -117,28 +143,3 @@ ORDER BY city, city_rank;
 -- Q73. Show cumulative salary distribution of employees.
 -- Q74. Find pizzas with highest order quantity per month.
 -- Q75. Show customers’ first and last order dates using window functions.
-
-
-
-
-
--- Recap of window functions --> also know as analytics funcitons
-CREATE TABLE workers (
-    worker_id INT PRIMARY KEY,
-    fname VARCHAR(50),
-    lname VARCHAR(50),
-    desig VARCHAR(50),
-    dept VARCHAR(50),
-    salary INT
-);
-INSERT INTO workers (worker_id, fname, lname, desig, dept, salary) VALUES
-(101, 'Raju', 'Rastogi', 'Manager', 'Loan', 37000),
-(102, 'Sham', 'Mohan', 'Cashier', 'Cash', 32000),
-(103, 'Baburao', 'Apte', 'Associate', 'Loan', 25000),
-(104, 'Paul', 'Philip', 'Accountant', 'Account', 45000),
-(105, 'Alex', 'Watt', 'Associate', 'Deposit', 35000),
-(106, 'Rick', 'Watt', 'Manager', 'Account', 65000),
-(107, 'Leena', 'Jhonson', 'Lead', 'Cash', 25000),
-(108, 'John', 'Paul', 'Manager', 'IT', 75000),
-(109, 'Alex', 'Watt', 'Probation', 'Loan', 40000);
-
