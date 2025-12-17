@@ -1,6 +1,16 @@
 -- D. Window Functions (Q51–Q75)
 
 -- Q51. Rank customers by total spending.
+SELECT 
+    c.customer_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+    SUM(o.total_amount) AS total_spent,
+    RANK() OVER (ORDER BY SUM(o.total_amount) DESC) AS spending_rank
+FROM customers c
+JOIN orders o
+    ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name;
+
 -- Q52. Show row_number for pizzas ordered.
 -- Q53. Show cumulative revenue by order_date.
 -- Q54. Find running total of pizzas sold.
@@ -25,3 +35,8 @@
 -- Q73. Show cumulative salary distribution of employees.
 -- Q74. Find pizzas with highest order quantity per month.
 -- Q75. Show customers’ first and last order dates using window functions.
+
+
+
+
+
