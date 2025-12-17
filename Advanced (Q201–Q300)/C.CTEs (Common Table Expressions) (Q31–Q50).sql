@@ -78,9 +78,83 @@ FROM delivery_count
 WHERE total_deliveries = (SELECT max_del FROM max_delivery);
 
 -- Q36. Use recursive CTE to show hierarchy of employees (Manager → Chef → Delivery Boy).
+WITH RECURSIVE emp_hierarchy AS (
+    SELECT 
+        employee_id,
+        name,
+        role,
+        1 AS lvl
+    FROM employees
+    WHERE role = 'Manager'
+
+    UNION ALL
+
+    SELECT
+        e.employee_id,
+        e.name,
+        e.role,
+        h.lvl + 1
+    FROM employees e
+    JOIN emp_hierarchy h
+        ON (h.role = 'Manager' AND e.role = 'Chef')
+        OR (h.role = 'Chef' AND e.role = 'Delivery Boy')
+)
+SELECT *
+FROM emp_hierarchy
+ORDER BY lvl;
+
 -- Q37. Find customers who ordered more than 5 pizzas using CTE.
+WITH pizza_count AS (
+    SELECT
+        o.customer_id,
+        SUM(oi.quantity) AS total_pizzas
+    FROM orders o
+    JOIN order_items oi 
+        ON oi.order_id = o.order_id
+    GROUP BY o.customer_id
+)
+SELECT
+    c.*
+FROM customers c
+JOIN pizza_count pc
+    ON pc.customer_id = c.customer_id
+WHERE pc.total_pizzas > 5;
+
 -- Q38. Show revenue per city using CTE.
+WITH revenue_per_city AS (
+    SELECT
+        c.city,
+        SUM(oi.quantity * p.price) AS total_revenue
+    FROM customers c
+    JOIN orders o ON o.customer_id = c.customer_id
+    JOIN order_items oi ON oi.order_id = o.order_id
+    JOIN pizzas p ON p.pizza_id = oi.pizza_id
+    GROUP BY c.city
+)
+SELECT *
+FROM revenue_per_city;
+
 -- Q39. Find most expensive pizza ordered per order using CTE.
+WITH most_expensive_pizza_ordered AS (
+    SELECT
+        oi.order_id,
+        MAX(p.price) AS Max_Pizza_Price
+    FROM order_items oi
+    JOIN pizzas p
+        ON p.pizza_id = oi.pizza_id
+    GROUP BY oi.order_id
+)
+SELECT 
+    mepo.order_id,
+    p.pizza_name,
+    p.price
+FROM pizzas p
+JOIN order_items oi
+    ON oi.pizza_id = p.pizza_id
+JOIN most_expensive_pizza_ordered mepo
+    ON mepo.order_id = oi.order_id
+WHERE p.price = mepo.Max_Pizza_Price;
+
 -- Q40. Use CTE to find pizzas ordered in June only.
 -- Q41. Show customers who ordered at least once per month using CTE.
 -- Q42. Find pizzas with revenue > avg revenue using CTE.
