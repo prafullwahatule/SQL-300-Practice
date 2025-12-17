@@ -155,12 +155,119 @@ JOIN most_expensive_pizza_ordered mepo
     ON mepo.order_id = oi.order_id
 WHERE p.price = mepo.Max_Pizza_Price;
 
--- Q40. Use CTE to find pizzas ordered in June only.
+-- Q40. Use CTE to find pizzas,  ordered in June only.
+WITH june_orders AS (
+    SELECT DISTINCT
+        oi.pizza_id
+    FROM orders o
+    JOIN order_items oi
+        ON oi.order_id = o.order_id
+    WHERE MONTH(o.order_date) = 6
+)
+SELECT
+    p.pizza_id,
+    p.pizza_name,
+    p.category,
+    p.price
+FROM pizzas p
+JOIN june_orders jo
+    ON jo.pizza_id = p.pizza_id;
+
 -- Q41. Show customers who ordered at least once per month using CTE.
+WITH per_month_order AS (
+    SELECT 
+        MONTH(order_date) AS Order_Month,
+        customer_id
+    FROM orders
+    GROUP BY customer_id, MONTH(order_date)
+)
+SELECT 
+    customer_id
+FROM per_month_order
+GROUP BY customer_id
+HAVING COUNT(*) = (
+    SELECT COUNT(DISTINCT MONTH(order_date)) FROM orders
+);
+
 -- Q42. Find pizzas with revenue > avg revenue using CTE.
+WITH pizza_revenue AS (
+    SELECT
+        p.pizza_id,
+        p.pizza_name,
+        SUM(oi.quantity * p.price) AS total_revenue
+    FROM pizzas p
+    JOIN order_items oi ON oi.pizza_id = p.pizza_id
+    GROUP BY p.pizza_id, p.pizza_name
+),
+avg_revenue_cte AS (
+    SELECT AVG(total_revenue) AS avg_revenue
+    FROM pizza_revenue
+)
+SELECT
+    pr.pizza_id,
+    pr.pizza_name,
+    pr.total_revenue
+FROM pizza_revenue pr
+JOIN avg_revenue_cte ar
+WHERE pr.total_revenue > ar.avg_revenue;
+
 -- Q43. Show city with max orders using CTE.
--- Q44. Find order with highest quantity using CTE.
+WITH city_order_count AS (
+    SELECT
+        c.city,
+        COUNT(o.order_id) AS total_orders
+    FROM customers c
+    JOIN orders o ON o.customer_id = c.customer_id
+    GROUP BY c.city
+),
+max_orders_cte AS (
+    SELECT MAX(total_orders) AS max_orders
+    FROM city_order_count
+)
+SELECT c.city, c.total_orders
+FROM city_order_count c
+JOIN max_orders_cte m
+WHERE c.total_orders = m.max_orders;
+
+-- Q44. Find order, with highest quantity using CTE.
+WITH order_quantity AS (
+    SELECT
+        order_id,
+        SUM(quantity) AS total_quantity
+    FROM order_items
+    GROUP BY order_id
+),
+max_order_cte AS (
+    SELECT MAX(total_quantity) AS max_quantity
+    FROM order_quantity
+)
+SELECT oq.order_id, oq.total_quantity
+FROM order_quantity oq
+JOIN max_order_cte m
+WHERE oq.total_quantity = m.max_quantity;
+
 -- Q45. Show customers who spent more than avg using CTE.
+WITH customer_spending AS (
+    SELECT
+        c.customer_id,
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+        SUM(o.total_amount) AS total_spent
+    FROM customers c
+    JOIN orders o ON o.customer_id = c.customer_id
+    GROUP BY c.customer_id, c.first_name, c.last_name
+),
+avg_spending AS (
+    SELECT AVG(total_spent) AS avg_spent
+    FROM customer_spending
+)
+SELECT
+    cs.customer_id,
+    cs.customer_name,
+    cs.total_spent
+FROM customer_spending cs
+JOIN avg_spending a
+WHERE cs.total_spent > a.avg_spent;
+
 -- Q46. Use CTE to find employees with more than 3 deliveries.
 -- Q47. Find pizzas ordered by customer Amit using CTE.
 -- Q48. Show monthly revenue trend with CTE.
