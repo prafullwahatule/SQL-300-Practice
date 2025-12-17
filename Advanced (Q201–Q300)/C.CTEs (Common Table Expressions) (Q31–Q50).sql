@@ -269,13 +269,91 @@ JOIN avg_spending a
 WHERE cs.total_spent > a.avg_spent;
 
 -- Q46. Use CTE to find employees with more than 3 deliveries.
+WITH delivery_count AS (
+    SELECT
+        e.employee_id,
+        e.name,
+        COUNT(d.delivery_id) AS total_deliveries
+    FROM employees e
+    JOIN deliveries d
+        ON d.employee_id = e.employee_id
+    GROUP BY e.employee_id, e.name
+)
+SELECT
+    e.employee_id,
+    e.name,
+    e.role,
+    e.salary,
+    dc.total_deliveries
+FROM employees e
+JOIN delivery_count dc
+    ON dc.employee_id = e.employee_id
+WHERE dc.total_deliveries > 3;
+
 -- Q47. Find pizzas ordered by customer Amit using CTE.
+WITH order_by_amit AS (
+    SELECT
+        c.first_name,
+        p.pizza_name
+    FROM customers c
+    JOIN orders o ON o.customer_id = c.customer_id
+    JOIN order_items oi ON oi.order_id = o.order_id
+    JOIN pizzas p ON p.pizza_id = oi.pizza_id
+    WHERE c.first_name = "Amit"
+)
+SELECT * FROM order_by_amit;
+
 -- Q48. Show monthly revenue trend with CTE.
+WITH monthly_trend AS (
+    SELECT
+        MONTHNAME(o.order_date) AS month_name,
+        SUM(oi.quantity * p.price) AS revenue
+    FROM orders o
+    JOIN order_items oi ON oi.order_id = o.order_id
+    JOIN pizzas p ON p.pizza_id = oi.pizza_id
+    GROUP BY MONTHNAME(o.order_date)
+)
+SELECT * FROM monthly_trend;
+
 -- Q49. Find distinct pizzas ordered by Sneha using CTE.
+WITH distinct_orders AS(
+	SELECT DISTINCT
+		p.pizza_name,
+		c.first_name
+    FROM pizzas p
+    JOIN order_items oi
+    ON oi.pizza_id = p.pizza_id
+    JOIN orders o
+    ON o.order_id = oi.order_id
+    JOIN customers c
+    ON c.customer_id = o.customer_id
+    WHERE c.first_name = "Sneha"
+    )
+SELECT * FROM distinct_orders;
+
 -- Q50. Show employees who delivered more than avg deliveries using CTE.
-
-
-
+WITH total_deliveries AS (
+    SELECT 
+        e.employee_id,
+        e.name,
+        COUNT(d.delivery_id) AS total_deliveries
+    FROM employees e
+    JOIN deliveries d
+        ON d.employee_id = e.employee_id
+    GROUP BY e.employee_id, e.name
+),
+avg_deliveries AS (
+    SELECT 
+        AVG(total_deliveries) AS avg_delivery
+    FROM total_deliveries
+)
+SELECT 
+    td.employee_id,
+    td.name,
+    td.total_deliveries
+FROM total_deliveries td
+JOIN avg_deliveries ad
+    ON td.total_deliveries > ad.avg_delivery;
 
 
 
