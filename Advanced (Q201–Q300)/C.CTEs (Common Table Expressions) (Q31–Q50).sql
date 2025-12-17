@@ -92,3 +92,81 @@ WHERE total_deliveries = (SELECT max_del FROM max_delivery);
 -- Q48. Show monthly revenue trend with CTE.
 -- Q49. Find distinct pizzas ordered by Sneha using CTE.
 -- Q50. Show employees who delivered more than avg deliveries using CTE.
+
+
+
+
+
+
+
+
+
+
+
+-- Recurcive CTE
+
+-- 1. Display number form 1 to 10 without using any in build functions
+WITH RECURSIVE numbers AS (
+	SELECT 1 AS n
+    UNION
+    SELECT n + 1
+    FROM numbers
+    WHERE n < 10
+    )
+SELECT * FROM numbers;
+
+-- 2. Find the hierarchy of the employee under a give manager name = "Asha"
+CREATE TABLE employees1 (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    manager_id INT NULL,
+    salary INT,
+    designation VARCHAR(100)
+);
+
+INSERT INTO employees1 (id, name, manager_id, salary, designation) VALUES
+(1, 'Shripadh', NULL, 10000, 'CEO'),
+(2, 'Satya', 5, 1400, 'Software Engineer'),
+(3, 'Jia', 5, 500, 'Data Analyst'),
+(4, 'David', 5, 1800, 'Data Scientist'),
+(5, 'Michael', 7, 3000, 'Manager'),
+(6, 'Arvind', 7, 2400, 'Architect'),
+(7, 'Asha', 1, 4200, 'CTO'),
+(8, 'Maryam', 1, 3500, 'Manager'),
+(9, 'Reshma', 8, 2000, 'Business Analyst'),
+(10, 'Akshay', 8, 2500, 'Java Developer');
+
+WITH RECURSIVE emp_hierarchy AS (
+    -- Anchor member (start point)
+    SELECT id, name, manager_id, designation, 1 as lvl
+    FROM employees1
+    WHERE name = 'Asha'
+
+    UNION
+
+    -- Recursive member (move upward to manager)
+    SELECT e.id, e.name, e.manager_id, e.designation, h.lvl + 1 as lvl  -- (Leval)
+    FROM employees1 e
+    JOIN emp_hierarchy h
+        ON h.id = e.manager_id
+)
+SELECT * FROM emp_hierarchy;
+
+
+-- Find the hierarchy of manager for given employee "David"
+
+WITH RECURSIVE emp_hierarchy AS (
+    -- Anchor member (start point)
+    SELECT id, name, manager_id, designation, 1 as lvl
+    FROM employees1
+    WHERE name = 'David'
+
+    UNION
+
+    -- Recursive member (move upward to manager)
+    SELECT e.id, e.name, e.manager_id, e.designation, h.lvl + 1 as lvl  -- (Leval)
+    FROM employees1 e
+    JOIN emp_hierarchy h
+        ON h.manager_id = e.id
+)
+SELECT * FROM emp_hierarchy;
