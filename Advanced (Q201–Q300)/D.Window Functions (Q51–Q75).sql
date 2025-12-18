@@ -284,7 +284,74 @@ FROM (
 WHERE rank_by_city = 2;
 
 -- Q71. Show percentile rank of pizza prices.
+SELECT
+    pizza_name,
+    price,
+    PERCENT_RANK() OVER (ORDER BY price) AS price_percentile
+FROM pizzas
+ORDER BY price;
+
 -- Q72. Show ntile(4) distribution of customers by spend.
+SELECT
+    c.customer_id,
+    CONCAT(first_name, ' ', last_name) AS cust_name,
+    SUM(p.price * oi.quantity) AS total_spend,
+    NTILE(4) OVER (ORDER BY SUM(p.price * oi.quantity)) AS quartile
+FROM customers c
+JOIN orders o
+    ON o.customer_id = c.customer_id
+JOIN order_items oi
+    ON oi.order_id = o.order_id
+JOIN pizzas p
+    ON p.pizza_id = oi.pizza_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_spend;
+
 -- Q73. Show cumulative salary distribution of employees.
+SELECT
+    employee_id,
+    name,
+    role,
+    salary,
+    SUM(salary) OVER (
+        ORDER BY salary
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS cumulative_salary
+FROM employees
+ORDER BY salary;
+    
 -- Q74. Find pizzas with highest order quantity per month.
+SELECT
+    pizza_name,
+    MONTHNAME(STR_TO_DATE(month_num, '%m')) AS month_name,
+    total_count
+FROM (
+    SELECT
+        p.pizza_name,
+        MONTH(o.order_date) AS month_num,
+        SUM(oi.quantity) AS total_count,
+        RANK() OVER (
+            PARTITION BY MONTH(o.order_date)
+            ORDER BY SUM(oi.quantity) DESC
+        ) AS rank_in_month
+    FROM pizzas p
+    JOIN order_items oi
+        ON p.pizza_id = oi.pizza_id
+    JOIN orders o
+        ON o.order_id = oi.order_id
+    GROUP BY p.pizza_name, MONTH(o.order_date)
+) t
+WHERE rank_in_month = 1
+ORDER BY month_num;
+
 -- Q75. Show customers’ first and last order dates using window functions.
+SELECT
+    c.customer_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS cust_name,
+    MIN(order_date) OVER (PARTITION BY customer_id) AS first_order_date,
+    MAX(order_date) OVER (PARTITION BY customer_id) AS last_order_date
+FROM orders o
+JOIN customers c
+    ON c.customer_id = o.customer_id
+ORDER BY customer_id;
+
