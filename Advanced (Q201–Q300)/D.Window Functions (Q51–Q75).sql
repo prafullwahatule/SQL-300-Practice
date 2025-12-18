@@ -129,15 +129,160 @@ GROUP BY p.pizza_name
 ORDER BY percentage DESC;
 
 -- Q61. Show moving average of total_amount per customer.
+SELECT
+    o.customer_id,
+    CONCAT_WS(' ', c.first_name, c.last_name) AS customer_name,
+    o.order_id,
+    o.order_date,
+    o.total_amount,
+    AVG(o.total_amount) 
+        OVER (
+            PARTITION BY o.customer_id 
+            ORDER BY o.order_date
+            ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
+        ) AS moving_avg_amount
+FROM orders o
+JOIN customers c
+    ON c.customer_id = o.customer_id
+ORDER BY o.customer_id, o.order_date;
+
 -- Q62. Show customers ranked by order count.
+SELECT
+    CONCAT_WS(' ', c.first_name, c.last_name) AS customer_name,
+    COUNT(DISTINCT o.order_id) AS order_count,
+    RANK() OVER (ORDER BY COUNT(DISTINCT o.order_id) DESC) AS rank_by_orders
+FROM customers c
+JOIN orders o 
+    ON o.customer_id = c.customer_id
+JOIN order_items oi
+    ON oi.order_id = o.order_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY rank_by_orders;
+
 -- Q63. Find nth highest pizza price using window function.
+SELECT *
+FROM (
+    SELECT
+        p.pizza_name,
+        p.category,
+        p.price,
+        DENSE_RANK() OVER (ORDER BY p.price DESC) AS nth_rank
+    FROM pizzas p
+) AS ranked_pizza
+WHERE nth_rank = 1;
+
 -- Q64. Show orders with difference from previous order.
+SELECT
+    order_id,
+    order_date,
+    total_amount,
+    total_amount 
+      - LAG(total_amount) OVER (ORDER BY order_date) AS diff_from_prev_order
+FROM orders
+ORDER BY order_date;
+
 -- Q65. Show average order value per month using partition.
+SELECT
+    order_id,
+    order_date,
+    MONTHNAME(order_date) AS month_name,
+    total_amount,
+    AVG(total_amount) 
+        OVER (PARTITION BY MONTH(order_date)) AS avg_order_value_per_month
+FROM orders
+ORDER BY order_date;
+
 -- Q66. Find repeat customers using row_number.
+SELECT
+    customer_id,
+    customer_name,
+    order_id,
+    order_date
+FROM (
+    SELECT
+        c.customer_id,
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+        o.order_id,
+        o.order_date,
+        ROW_NUMBER() 
+            OVER (PARTITION BY c.customer_id ORDER BY o.order_date) AS rn
+    FROM customers c
+    JOIN orders o
+        ON o.customer_id = c.customer_id
+) t
+WHERE rn > 1
+ORDER BY customer_id, order_date;
+
 -- Q67. Show orders ranked within each customer.
+SELECT
+	o.order_id,
+    c.customer_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS customer_name,
+    o.order_date,
+    o.total_amount,
+    ROW_NUMBER() OVER (
+    PARTITION BY c.customer_id 
+    ORDER BY o.order_date
+) AS cust_rank
+FROM orders o
+JOIN customers c
+ON c.customer_id = o.customer_id;
+
 -- Q68. Show pizzas ranked by revenue per category.
+SELECT
+	p.pizza_name,
+    p.category,
+    SUM(p.price * oi.quantity) AS revenue,
+    DENSE_RANK() OVER(PARTITION BY p.category
+    ORDER BY SUM(p.price * oi.quantity) DESC) AS cat_rank
+FROM pizzas p
+JOIN order_items oi
+ON oi.pizza_id = p.pizza_id
+GROUP BY p.pizza_id, p.pizza_name, p.category;
+
 -- Q69. Show cumulative pizzas sold per category.
+SELECT
+    p.category,
+    p.pizza_name,
+    SUM(oi.quantity) AS pizzas_sold,
+    SUM(SUM(oi.quantity)) OVER (
+        PARTITION BY p.category
+        ORDER BY p.pizza_name
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS cumulative_pizzas_sold
+FROM pizzas p
+JOIN order_items oi
+ON oi.pizza_id = p.pizza_id
+GROUP BY p.category, p.pizza_name
+ORDER BY p.category, p.pizza_name;
+
 -- Q70. Find customers with 2nd highest spend in each city.
+SELECT *
+FROM (
+    SELECT
+        c.customer_id,
+        CONCAT(c.first_name, ' ', c.last_name) AS cust_name,
+        c.city,
+        SUM(p.price * oi.quantity) AS total_spend,
+        DENSE_RANK() OVER (
+            PARTITION BY c.city
+            ORDER BY SUM(p.price * oi.quantity) DESC
+        ) AS rank_by_city
+    FROM customers c
+    JOIN orders o
+        ON o.customer_id = c.customer_id
+    JOIN order_items oi
+        ON oi.order_id = o.order_id
+    JOIN pizzas p
+        ON p.pizza_id = oi.pizza_id
+    GROUP BY 
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        c.city
+) t
+WHERE rank_by_city = 2;
+
 -- Q71. Show percentile rank of pizza prices.
 -- Q72. Show ntile(4) distribution of customers by spend.
 -- Q73. Show cumulative salary distribution of employees.
