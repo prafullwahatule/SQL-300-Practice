@@ -72,7 +72,7 @@ All tables are connected using **proper foreign keys** to simulate real business
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/prafull816/sql-300-practice.git
+git clone https://github.com/prafullwahatule/sql-300-practice.git
 ```
 2. Open MySQL / MySQL Workbench
 
