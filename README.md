@@ -123,8 +123,20 @@ schema/PizzaDB_schema.sql
 
 ---
 
-📌 Author
+---
+## 🙏 Acknowledgement  
 
-Prafull Wahatule
-📧 SQL & Data Analytics Enthusiast
-🔗 GitHub: https://github.com/prafullwahatule
+Special thanks to the **Retail Sales Sharing Dataset (Open Data)** for providing an excellent real-world dataset.  
+This project was created as part of a **Data Analytics learning journey** using **Power BI**.  
+
+---
+
+## 📎 Author  
+
+**👤 Name:** Prafull Wahatule  
+**📧 Email:** [prafullwahatule@gmail.com](mailto:prafullwahatule@gmail.com)  
+**💻 GitHub:** [prafullwahatule](https://github.com/prafullwahatule)  
+
+---
+
+⭐ *If you found this project helpful, don’t forget to star the repository!* ⭐
