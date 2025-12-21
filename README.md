@@ -91,7 +91,7 @@ schema/PizzaDB_schema.sql
 
 ---
 
-🎯 Who Is This For?
+## 🎯 Who Is This For?
 
 - SQL Beginners → Advanced learners
 
@@ -103,7 +103,9 @@ schema/PizzaDB_schema.sql
 
 - Portfolio / GitHub showcase
 
-🛠️ Tech Stack
+---
+
+## 🛠️ Tech Stack
 
 1. Database: MySQL
 
@@ -113,7 +115,7 @@ schema/PizzaDB_schema.sql
 
 --- 
 
-⭐ Highlights
+## ⭐ Highlights
 
 ✔ 300 well-structured SQL questions
 ✔ Real-world business scenarios
@@ -123,7 +125,6 @@ schema/PizzaDB_schema.sql
 
 ---
 
----
 ## 🙏 Acknowledgement  
 
 Special thanks to the **Retail Sales Sharing Dataset (Open Data)** for providing an excellent real-world dataset.  
